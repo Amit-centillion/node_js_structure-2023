@@ -5,7 +5,7 @@ import { ENV } from './src/constants';                                   //env f
 import ip from 'ip';
 
 import routes from './src/routes';                                       //main line of this file is routes variable
-
+import axios from 'axios';												//it's a axios npm package for featch the api data
 const {
 	SERVER: { PORT },
 } = ENV;
@@ -25,3 +25,8 @@ server.listen(PORT || 3002, () => {                                       //serv
 	console.info(cyanBright(`${greenBright('\tLocalhost:')} ${BASE_API_URL}`));
 	console.info(cyanBright(`${greenBright('\tLAN:')} ${NETWORK_BASE_API_URL}`));
 });
+
+// axios.get('http://localhost:5000/api/v1/admin/user')
+// .then(function(response){
+// 	console.log("response",response.data)
+// })
