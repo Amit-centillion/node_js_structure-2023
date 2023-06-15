@@ -23,5 +23,5 @@ const NETWORK_BASE_API_URL = `http://${ip.address()}:${PORT}/api/v1/`;
 server.listen(PORT || 3002, () => {                                       //server create code
     console.info(cyanBright('API Running at'));
 	console.info(cyanBright(`${greenBright('\tLocalhost:')} ${BASE_API_URL}`));
-	console.info(cyanBright(`${greenBright('\tLAN:')} ${NETWORK_BASE_API_URL}`));
+	// console.info(cyanBright(`${greenBright('\tLAN:')} ${NETWORK_BASE_API_URL}`)); // server ip address you can deployeee
 });
