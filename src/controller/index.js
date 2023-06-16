@@ -1,1 +1,0 @@
-export {default as testApicontroller } from './test-api.controller'

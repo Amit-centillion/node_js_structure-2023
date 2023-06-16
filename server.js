@@ -3,7 +3,7 @@ import './src/config/dbConnection';
 import { greenBright,cyanBright } from 'chalk';                         
 import { ENV } from './src/constants';                                  
 
-import routes from './src/routes';                                      
+import routes from './src/index';                                      
 
 const {
 	SERVER: { PORT },
