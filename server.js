@@ -1,24 +1,17 @@
-import express ,{json} from 'express';                     				 
-import './src/config/dbConnection';                                     
-import { greenBright,cyanBright } from 'chalk';                         
-import { ENV } from './src/constants';                                  
+const express = require("express");
+require("./src/config/dbConnection");
+const { ENV_CCONST } = require("./src/constants/envVariable");
 
-import routes from './src/routes';                                      
+const userRoutes = require("./src/routes");
+const app = express();
 
-const {
-	SERVER: { PORT },
-} = ENV;
+app.use(express.json());
+app.use("/api/v1", userRoutes);
 
-const server = express();                                               
-server.use(json());														
+const HOST = process.env.HOST || "localhost";
+const BASE_API_URL = `http://${HOST}:${ENV_CCONST.SERVER.PORT}/api/v1/`;
 
-server.use('/api/v1', routes);                                          
-
-const HOST = process.env.HOST || 'localhost';
-
-const BASE_API_URL = `http://${HOST}:${PORT}/api/v1/`;              
-
-server.listen(PORT || 3002, () => {            
-    console.info(cyanBright('API Running at'));
-	console.info(cyanBright(`${greenBright('\tLocalhost:')} ${BASE_API_URL}`));
+app.listen(ENV_CCONST.SERVER.PORT || 3002, () => {
+  console.info("API Running at");
+  console.info(`${"\tLocalhost:"} ${BASE_API_URL}`);
 });
