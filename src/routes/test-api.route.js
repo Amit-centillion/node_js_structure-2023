@@ -1,8 +1,7 @@
-import express from "express";
-import testApi from "../controller/test-api.controller"
-
+const express = require("express");
+const { update } = require("../controller/test-api.controller");
 const router = express.Router();
 
-router.post("/testApiCall",testApi.update);
+router.post("/testApiCall", update);
 
 module.exports = router;
