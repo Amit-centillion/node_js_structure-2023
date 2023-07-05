@@ -4,28 +4,28 @@ const update = async (req, res) => {
   try {
     const data = { ...req.body };
     const findUser = await user.findOne({ firstName: data.firstName });
-    // if (findUser != null) {
-    //   return res.status(400).json({
-    //     status: false,
-    //     message: "user alrady exiest !",
-    //     data: null,
-    //   });
-    // } else {
-    const saveData = new user(data);
-    const saveResponse = await saveData.save();
-    if (saveResponse) {
-      return res.status(200).json({
-        status: true,
-        message: "user created successfully.",
-        data: saveResponse,
+    if (findUser != null) {
+      return res.status(400).json({
+        status: false,
+        message: "user alrady exiest !",
+        data: null,
       });
     } else {
-      return res.status(500).josn({
-        status: false,
-        message: "something went wrong !",
-      });
+      const saveData = new user(data);
+      const saveResponse = await saveData.save();
+      if (saveResponse) {
+        return res.status(200).json({
+          status: true,
+          message: "user created successfully.",
+          data: saveResponse,
+        });
+      } else {
+        return res.status(500).josn({
+          status: false,
+          message: "something went wrong !",
+        });
+      }
     }
-    // }
   } catch (error) {
     console.log("error", error);
     throw error;
