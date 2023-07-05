@@ -1,1 +1,1 @@
-export {default as testApicontroller } from './test-api.controller'
+export { default as userController } from "./user.controller";
