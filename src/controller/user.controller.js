@@ -76,11 +76,13 @@ const login = async (req, res) => {
       });
     }
   } catch (error) {
+    console.log("error", error);
     throw error;
   }
 };
 const index = async (req, res) => {
   try {
+    console.log("current user", req.currentUser);
     const data = { ...req.body };
     const sortKey = data.sortKey || "firstName";
     const sortDirection = data.sortDirection == "DESC" ? -1 : 1;
@@ -194,10 +196,31 @@ const verifyEmail = async (req, res) => {
     throw error;
   }
 };
+const testfunction = async (req, res) => {
+  const { status } = req.body;
+
+  const promise = new Promise((resolve, reject) => {
+    if (status == "false") {
+      reject(new Error("Something went wrong"));
+    } else {
+      resolve("Hello, World!");
+    }
+  });
+
+  // Handle the promise
+  promise
+    .then((result) => {
+      res.send(result);
+    })
+    .catch((error) => {
+      res.status(500).send(error.message);
+    });
+};
 module.exports = {
   registration,
   index,
   login,
   forgot,
   verifyEmail,
+  testfunction,
 };

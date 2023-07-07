@@ -5,15 +5,18 @@ const {
   login,
   forgot,
   verifyEmail,
+  testfunction,
 } = require("../controller/user.controller");
 const { validate, auth_schema } = require("../utils/validation");
+const authentication = require("./../middleware/authentication");
 
 const router = express.Router();
 
 router.post("/register", [validate(auth_schema.register)], registration);
-router.get("/index", index);
+router.get("/index", [authentication], index);
 router.post("/login", [validate(auth_schema.auth)], login);
 router.post("/forgot", [validate(auth_schema.forgot)], forgot);
-router.post("/verifyEmail", verifyEmail);
+router.post("/verifyEmail", authentication, verifyEmail);
+router.post("/testFunction", testfunction);
 
 module.exports = router;

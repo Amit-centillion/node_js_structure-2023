@@ -13,6 +13,12 @@ const MESSAGE = {
     OTP_INVALID: "Otp Invalid!",
     PASSWORD_NOT_MATCH: "Password not matched!",
   },
+  SERVER: {
+    TOKEN_NOT_PASS: "Plase pass the authontication token!",
+    TOKEN_INVALID: "Token is Invalid",
+    TOKEN_IS_EXPIRED: "Token is Expired.",
+    SESSION_EXPIRE: "Session expired",
+  },
 };
 
 module.exports = {

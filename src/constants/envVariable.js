@@ -9,7 +9,7 @@ const ENV_CCONST = {
   },
   secreate: {
     jwt: process.env.JWT_SECRET || "CHENNAI_AIRPORT_SECRET",
-    jwt_expiry: process.env.JWT_EXPIRY || "4h",
+    jwt_expiry: "50s",
     jwt_refresh_token:
       process.env.JWT_REFRESH_SECRET || "CHENNAI_AIRPORT_REFRESH_SECRET",
     jwt_refresh_token_expiry: process.env.JWT_REFRESH_TOKEN_EXPIRY || "30d",
