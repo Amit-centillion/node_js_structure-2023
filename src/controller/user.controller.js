@@ -1,13 +1,23 @@
 const user = require("../model/user");
-const { PaginateOptions, PaginateResult } = require("mongoose");
-const update = async (req, res) => {
+const bcrypt = require("bcrypt");
+const jsonwebtoken = require("jsonwebtoken");
+const { ENV_CCONST } = require("../constants/envVariable");
+const { MESSAGE } = require("../constants/message");
+const { USER } = MESSAGE;
+const { sendMail } = require("../utils/sendMail");
+const { otpGenerator } = require("../utils/otpGenreate");
+const registration = async (req, res) => {
   try {
     const data = { ...req.body };
     const findUser = await user.findOne({ firstName: data.firstName });
+    data.password = bcrypt.hashSync(
+      data.password,
+      bcrypt.genSaltSync(ENV_CCONST.secreate.salt)
+    );
     if (findUser != null) {
       return res.status(400).json({
         status: false,
-        message: "user alrady exiest !",
+        message: USER.EXIEST,
         data: null,
       });
     } else {
@@ -16,25 +26,62 @@ const update = async (req, res) => {
       if (saveResponse) {
         return res.status(200).json({
           status: true,
-          message: "user created successfully.",
+          message: USER.CREATE,
           data: saveResponse,
         });
       } else {
         return res.status(500).josn({
           status: false,
-          message: "something went wrong !",
+          message: USER.SOMTHING_WRONG,
         });
       }
     }
   } catch (error) {
-    console.log("error", error);
+    throw error;
+  }
+};
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const findUser = await user.findOne({
+      email: email,
+    });
+    if (findUser) {
+      const matchedUser = bcrypt.compareSync(password, findUser.password);
+      if (matchedUser) {
+        const request = {
+          _id: findUser._id,
+          firstName: findUser.firstName,
+          lastName: findUser.lastName,
+          mobileNumber: findUser.mobileNumber,
+        };
+        const token = jsonwebtoken.sign(request, ENV_CCONST.secreate.jwt, {
+          expiresIn: `${ENV_CCONST.secreate.jwt_expiry}`,
+        });
+        return res.status(200).json({
+          status: true,
+          data: { request, token },
+          message: USER.LOGIN,
+        });
+      } else {
+        return res.status(400).json({
+          status: false,
+          message: USER.PASSWORD_INCORRECT,
+        });
+      }
+    } else {
+      return res.status(400).json({
+        status: false,
+        data: USER.USER_NOT_FOUND,
+      });
+    }
+  } catch (error) {
     throw error;
   }
 };
 const index = async (req, res) => {
   try {
     const data = { ...req.body };
-    console.log("data", data);
     const sortKey = data.sortKey || "firstName";
     const sortDirection = data.sortDirection == "DESC" ? -1 : 1;
     const criteria = {
@@ -62,16 +109,95 @@ const index = async (req, res) => {
     if (request) {
       return res.status(200).json({
         status: 200,
-        message: "user fetched successfully.",
+        message: USER.USER_FATCHED,
         data: request,
       });
     }
   } catch (error) {
-    console.log("error", error);
+    throw error;
+  }
+};
+
+const forgot = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const findUser = await user.findOne({ email: email });
+    if (findUser) {
+      const createOtp = otpGenerator();
+      const payload = { otp: createOtp };
+      const update = await user.findByIdAndUpdate(
+        { _id: findUser._id },
+        payload,
+        { upsert: true, new: true }
+      );
+      await sendMail(
+        email,
+        ENV_CCONST.sendMailDetail.subject,
+        `Hii ${findUser.firstName}, Your otp is ${createOtp} `
+      );
+      return res.status(200).json({
+        status: true,
+        message: USER.EMAIL_SEND_SUCCESSFULLY,
+        data: update,
+      });
+    } else {
+      return res.status(400).json({
+        status: false,
+        data: USER.USER_NOT_FOUND,
+      });
+    }
+  } catch (error) {
+    throw error;
+  }
+};
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { otp, email, newPassword, retypePassword } = req.body;
+    const findUser = await user.findOne({ email: email, otp: otp });
+    if (findUser) {
+      if (newPassword === retypePassword) {
+        findUser.password = bcrypt.hashSync(
+          newPassword,
+          bcrypt.genSaltSync(ENV_CCONST.secreate.salt)
+        );
+        const update = await user.findByIdAndUpdate(
+          { _id: findUser._id },
+          { password: findUser.password, otp: null },
+          { upsert: true, new: true }
+        );
+        if (update == null) {
+          return res.status(400).json({
+            status: false,
+            message: USER.OTP_EXPIRE,
+          });
+        } else {
+          return res.status(200).json({
+            status: 200,
+            message: USER.PASSWORD_CHANGE_SUCCESSFULLY,
+            data: update,
+          });
+        }
+      } else {
+        return res.status(200).json({
+          status: false,
+          message: USER.PASSWORD_NOT_MATCH,
+        });
+      }
+    } else {
+      return res.status(400).json({
+        status: false,
+        data: USER.OTP_EXPIRE,
+      });
+    }
+  } catch (error) {
     throw error;
   }
 };
 module.exports = {
-  update,
+  registration,
   index,
+  login,
+  forgot,
+  verifyEmail,
 };
