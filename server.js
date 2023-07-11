@@ -1,24 +1,29 @@
-import express ,{json} from 'express';                     				 
-import './src/config/dbConnection';                                     
-import { greenBright,cyanBright } from 'chalk';                         
-import { ENV } from './src/constants';                                  
+import express, { json } from "express";
+import "./src/config/dbConnection";
+import { greenBright, cyanBright } from "chalk";
+const app = express();
+const cors = require("cors");
+// import { cors } from "cros";
+import { ENV } from "./src/constants";
 
-import routes from './src/index';                                      
+import routes from "./src/index";
 
 const {
-	SERVER: { PORT },
+  SERVER: { PORT },
 } = ENV;
 
-const server = express();                                               
-server.use(json());														
+// server.use(cors("*"));
+// const server = express();
+app.use(json());
+app.use(cors());
 
-server.use('/api/v1', routes);                                          
+app.use("/api/v1", routes);
 
-const HOST = process.env.HOST || 'localhost';
+const HOST = process.env.HOST || "localhost";
 
-const BASE_API_URL = `http://${HOST}:${PORT}/api/v1/`;              
+const BASE_API_URL = `http://${HOST}:${PORT}/api/v1/`;
 
-server.listen(PORT || 3002, () => {            
-    console.info(cyanBright('API Running at'));
-	console.info(cyanBright(`${greenBright('\tLocalhost:')} ${BASE_API_URL}`));
+app.listen(PORT || 3002, () => {
+  console.info(cyanBright("API Running at"));
+  console.info(cyanBright(`${greenBright("\tLocalhost:")} ${BASE_API_URL}`));
 });

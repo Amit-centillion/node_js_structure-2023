@@ -5,6 +5,9 @@ const UserShcema = new Schema(
     name: {
       type: String,
     },
+    email: {
+      type: String,
+    },
     isActive: {
       type: Boolean,
       default: true,
